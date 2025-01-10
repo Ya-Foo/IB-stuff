@@ -1,2 +1,28 @@
 \usepackage[english]{babel}
 \usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
+
+% margin of paper
+\usepackage[a4paper, portrait, margin=1.25in]{geometry}
+\usepackage{layout}
+
+% font: Times New Roman
+\usepackage{mathptmx}
+
+% Counter for definition
+\newcounter{defcounter}
+
+% Definition environment
+\newenvironment{definition}
+    {
+        \\ [0.5cm]
+        \begin{tabular}{|p{1\textwidth}|}
+        \hline \\ [-1ex]
+        \refstepcounter{defcounter}
+        \textbf{Definition \thedefcounter.}
+    }
+    { 
+        \\ [1.5ex]
+        \hline
+        \end{tabular}
+    }
+\numberwithin{defcounter}{section}
