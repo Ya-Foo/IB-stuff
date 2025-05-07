@@ -1,0 +1,56 @@
+\section{Mathematical Frameworks}
+\hrule height 1pt
+\vspace*{5pt}
+
+\subsection{Parametric Surfaces}
+\vspace*{-10pt}
+A surface in three-dimensional space is often most effectively 
+described using a parametric representation. In this framework, a 
+surface is defined by a vector-valued function
+\[
+    \vec{r}(u,v)=x(u,v)\vec{i} + y(u,v)\vec{j} + z(u,v)\vec{k}
+\]
+where $u$ and $v$ are independent parameters that vary over a 
+two-dimensional region $D$ in the $uv$-plane. The set of all such position 
+vectors forms the parametric surface $S$ (Dawkins, 2024).
+
+Unlike implicit surfaces defined by equations of the form $F(x,y,z)=0$, parametric
+surfaces allow for the direct generation of points and the computation of geometric
+properties such as tangent vectors through partial derivatives, which will later 
+on prove itself useful in the context of cartography.
+
+If we express the two parameters $u$ and $v$ as a function of another variable
+$t$, then by applying the chain rule to $\vec{r}(u(t),v(t))$ with respect to 
+$t$, we get:
+\[
+    \frac{d\vec{r}}{dt}=\frac{\partial \vec{r}}{\partial u}\frac{du}{dt}+\frac{\partial \vec{r}}{\partial v}\frac{dv}{dt}
+\]
+This derivative represents the tangent to the curve formed by $u(t)$ and $v(t)$ 
+(Patrikalakis et al., 2009).
+
+Another important property of surfaces, particularly relevant in cartography, 
+is the notion of smoothness. Depending on the desired level of accuracy, the 
+Earth's surface may be modeled in various ways: as a perfect sphere, an oblate 
+spheroid, or a more complex geoid that represents mean sea level variations. 
+Regardless of the chosen model, a key geometric feature of such surfaces is 
+that, when observed at an infinitesimally small scale, they resemble a flat 
+plane. In other words, the surface is locally planar, a property that 
+characterizes it as smooth (Ozuch, 2024).
+
+As mentioned in the introduction, we will model the Earth as a perfect sphere
+due to the limited scope of this Extended Essay. Let $\phi$ and $\lambda$ be
+the longitude and latitude of the Earth, acting as parameters of the surface, 
+and let $M(\phi,\lambda)$ be a point on the Earth's surface. 
+
+<insert diagram here>
+
+Fix the center of the spherical Earth at the Cartesian coordinate $(0,0,0)$, with
+the poles aligning with the $z$-axis. Let $M'$ be the projection of point $M$ onto
+the $xy$-plane in 3D Cartesian space. We can see that the $z$-coordinate of $M$
+would be the length $MM'=R\sin\lambda$.
+
+To find the $x$ and $y$-coordinate of $M$, we can also use trigonometry and obtain
+\begin{align}
+    x&=OM'\cos\lambda=R\cos\lambda\cos\phi\\
+    y&=OM'\sin\lambda=R\cos\lambda\sin\phi
+\end{align}
