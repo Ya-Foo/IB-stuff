@@ -1,15 +1,17 @@
 \usepackage[english]{babel}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{wrapfig}
 \graphicspath{ {./figures/} }
 
+% Customing lists
+\usepackage{enumitem}
+\setlist{nolistsep}
+
 % margin of paper
 \usepackage[a4paper, portrait, margin=1in]{geometry}
-
-% font: Times New Roman
-\usepackage{mathptmx}
 
 % graphics and plots
 \usepackage{pgfplots}
@@ -50,7 +52,6 @@
 % Custom box environment
 \newtcolorbox{custombox}[3]{
     enhanced, 
-    boxrule=0.65pt,
     colframe=black, 
     colback=ivory,
     title=\textbf{#1 #2. \hspace*{5pt} #3},
@@ -61,7 +62,8 @@
     titlerule=0pt,
     before skip=7.5pt, 
     after skip=12.5pt, 
-    arc=5pt,
+    arc=1.5mm, 
+    drop fuzzy shadow southeast,
 }
 
 % Definition environment
