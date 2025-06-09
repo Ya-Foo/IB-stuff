@@ -1,0 +1,34 @@
+\section{\textsc{Evaluation}}
+\hrule height 0.5pt
+\vspace*{2.5pt}
+
+While the outcome of this investigation was rather successful, there were notable assumptions and methodological limitations that could 
+have been better addressed and improved.
+
+One of the most significant setbacks was the initial decision to generate terrain maps at a resolution $1024\times1042$ pixels. While the intention 
+was to match the granularity of real-world terrain, this approach quickly proved computationally efficient, especially for the Moran's I calculations 
+which took at least 2 hours to finish for one map. To ensure feasibility within the timeline, I had to reduce the resolution to $256\times256$. Although 
+this allowed for smoother experimentation, it introduced the trade off that the lower resolution may not have captured finer-scale topographic features, 
+potentially limiting the fairness of direct comparisons with real-world datasets. Even when I tried to resample real-world datasets to match the $256\times256$
+resolution of the noise maps, it smoothed and altered the fine-scale features in the original terrain data, which downgraded the accuracy of spatial and 
+spectral comparisons. In future investigations, a multiscale analysis could be adopted to examine noise performance at multiple resolutions.  
+
+Moreover, several assumptions were made without rigorous justification. For instance, while constructing the smoothstep functions used in interpolation, I assumed 
+that the order must be odd to satisfy a symmetry condition. Although this assumption aligns with some sources, I was unable to produce a formal mathematical proof. 
+This is an area where greater rigor could be applied in future iterations of this investigation. 
+
+A similar limitation concern the preference of Moran's I over Geary's C in evaluating spatial autocorrelation. While I justified this based on the focus of my 
+analysis on global similarity patterns, I did not conduct a comparative analysis of the two metrics, nor did I examine cases where Geary's C might yield extra 
+helpful insights. Including such a comparison could have added depth to my conclusions and strengthened the reliability of the findings. 
+
+Another methodological refinement that could enhance the evaluation of realism is the classification of noise colour. Terrain surfaces, like many natural phenomena, 
+often exhibit red noise characteristics, where lower spatial frequencies dominate. Incorporating spectral slope analysis to determine whether the noise resembles 
+red, pink, white, or blue noise would offer an additional dimension of realism assessment. Since human perception tends to associate “naturalness” with red noise 
+(Haroz, 2006), this framework could help formalize qualitative judgments of visual realism.
+
+I had also utilized only one set of parameters to perform the comparison, which discards numerous other possibilities that could have enhanced the synthetic noise 
+similarities to real terrain. This was done because otherwise it would go beyond the scope of this IA. However, in the future, I would investigate with different 
+parametric settings; although I cannot include all in the paper, at least I could compile into a concise table and put in the Appendix. 
+
+Finally, a limitation inherent in my methodology was the reliance on a fixed seed for initial comparisons. Larger sample size could have been employed to more 
+robustly quantify the variance and confidence in the conclusion. 

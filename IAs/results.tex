@@ -1,0 +1,53 @@
+\section{\textsc{Results}}
+\hrule height 0.5pt
+\vspace*{2.5pt}
+
+\subsection{\textsc{Calculation}}
+\vspace*{-10pt}
+
+Before using technology to produce a complete terrain map, I will show the hand calculation for one pixel $(u,v)=(3,143)$ in both Value 
+and Perlin noise. The parameters will be $\lambda_0=2$, $A_0=1$, $L=2$, $P=0.5$, and $O=6$. The seed, as mentioned in the introduction, 
+is $30042603$. 
+
+Firstly, transform pixel coordinates into the domain of the noise function, then scale by $\lambda_0$ which gives:
+\[\left(\frac{u}{N}\lambda_0,\frac{v}{N}\lambda_0\right)=\left(\frac{3}{256}\cdot2,\frac{143}{256}\cdot2\right)=\left(\frac{3}{128},\frac{143}{128}\right)\]
+Next, find the associated top-left vertex:
+\[(i,j)=\left(\left\lfloor\frac{3}{128}\right\rfloor,\left\lfloor\frac{143}{128}\right\rfloor\right)=(0,1)\]
+which means the other three vertices are $(1,1)$, $(0,2)$, and $(1,2)$.
+
+Generating random scalar values for the lattice function $G_V$ with the seed, we obtain:
+\begin{equation*}
+    \begin{bmatrix}
+        G_V(0,1) & G_V(1,1)\\
+        G_V(0,2) & G_V(1,2)
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        0. & 0.\\
+        0. & 0.
+    \end{bmatrix}
+\end{equation*}
+Substituting these values into our bilinear interpolation (Equation \ref{eq:1}), with the cubic smoothstep function $S_3(t)$ (Equation \ref{eq:3}):
+\begin{align*}
+    \EuScript{N}_V\left(\frac{3}{128},\frac{143}{128}\right)&=
+    \begin{bmatrix}
+        1-S_n(\frac{3}{128}-0) & S_n(\frac{3}{128}-0)
+    \end{bmatrix}
+    \begin{bmatrix}
+        G_V(0,1) & G_V(1,1)\\
+        G_V(0,2) & G_V(1,2)
+    \end{bmatrix}
+    \begin{bmatrix}
+        1-S_n(\frac{143}{128}-1)\\
+        S_n(\frac{143}{128}-1)
+    \end{bmatrix}\\
+    &\approx a
+\end{align*}
+Finally, multiply the value by the amplitude to get the final elevation value at the pixel $(3,143)$.
+\[A_0\cdot\EuScript{N}_V\left(\frac{3}{128},\frac{143}{128}\right)\]
+Repeat this process and plot them to all the appropriate pixels using technology, we will obtain the full map for one set of amplitude and frequency. 
+\subsection{\textsc{Visual Comparison}}
+\vspace*{-10pt}
+
+\subsection{\textsc{Quantitative Comparison}}
+\vspace*{-10pt}
