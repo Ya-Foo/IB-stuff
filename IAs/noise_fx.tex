@@ -184,8 +184,7 @@ Applying the continuity and boundary condition:
 PUT GAUSSIAN ELIMINATION STUFF HERE LATER
 
 There are two other parameters we will adress: persistence and lacunarity. Typically, a noise function with a single frequency will look 
-overly smooth and artificial because it only captures one level of detail, as illustrated in [FIGURE REF] and [FIGURE REF] in [SECTION REF].
-Natural terrains, exhibit complexity at multiple scales. For instance, a mountain presents broad overall forms alongside finer features such 
+overly smooth and artificial. Natural terrains, on the other hand, exhibit complexity at multiple scales. For instance, a mountain presents broad overall forms alongside finer features such 
 as ridges and crevices layered atop one another.
 
 To replicate the complexity of natural terrains, fractal noise is used where multiple layers of noise (called octaves) are summed, each with 
@@ -210,7 +209,7 @@ which gives us the inequality:
 \end{align*}
 Having introduced the core theory and parameters in this IA, I will now present the quantitative tools that will be used to compare the noise functions.
 
-\subsection{\textsc{Quantitative Metrics}}
+\subsection{\textsc{Quantitative Metrics}} \label{quant_metrics}
 \vspace*{-10pt}
 
 Firstly, all elevation values generated from noise functions are aggregated and plotted onto a histogram to analyze their statistical distribution. The 
@@ -226,7 +225,7 @@ The variance ($\sigma^2$) quantifies how spread out the elevations are from the 
 To assess the shape of the distribution, skewness ($\gamma_1$) is used to measure asymmetry in the dataset, where a value close to 0 suggests a symmetric 
 distribution of heights. 
 \[\gamma_1=\frac{1}{N^2}\sum_{u=0}^{N-1}\sum_{v=0}^{N-1}{\left(\frac{X_{u,v}-\mu}{\sigma}\right)}^3\]
-Furthermore, kurtosis, precisely Fisher's kurtosis, will be used to measure the "peakedness" of the elevation distribution compared to a normal distribution, where positive kurtosis 
+Furthermore, kurtosis, precisely Fisher's kurtosis ($\gamma_2$), will be used to measure the "peakedness" of the elevation distribution compared to a normal distribution, where positive kurtosis 
 means a more peaked distribution, while negative kurtosis means a flatter one.
 \[\gamma_2=-3+\frac{1}{N^2}\sum_{u=0}^{N-1}\sum_{v=0}^{N-1}{\left(\frac{X_{u,v}-\mu}{\sigma}\right)}^4\]
 Finally, the Terrain Ruggedness Index (TRI) quantifies how much the elevation changes between a grid cell and its neighbors, with higher TRI values indicate 
