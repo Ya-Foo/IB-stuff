@@ -188,9 +188,9 @@ overly smooth and artificial. Natural terrains, on the other hand, exhibit compl
 as ridges and crevices layered atop one another.
 
 To replicate the complexity of natural terrains, fractal noise is used where multiple layers of noise (called octaves) are summed, each with 
-decreasing amplitude and increasing frequency. The parameter persistence, $0<p<1$, controls the rate at which amplitude decay, ensuring higher 
+decreasing amplitude and increasing frequency. The parameter persistence, $0<P<1$, controls the rate at which amplitude decay, ensuring higher 
 frequency details do not overwhelm the overall coherence. Lacunarity, $L>1$, determines the rate of frequency growth, introducing finer-scale 
-variations. Finally, the total number of octaves, $C\ge 1$, controls the level of detail in the terrain. Putting this together, the final terrain 
+variations. Commonly, the value of $P$ and $L$ is chosen such that $P\cdot L=1$. Finally, the total number of octaves, $C\ge 1$, controls the level of detail in the terrain. Putting this together, the final terrain 
 height at pixel $(u,v)$ is given by:
 \[\EuScript{N}_{FV}(x,y)=\sum_{k=0}^{C-1}A_k\cdot\EuScript{N}_V\left(\lambda_k\frac{u}{N},\lambda_k\frac{v}{N}\right)\]
 where
@@ -253,7 +253,13 @@ where
     \item $w_{i,j}$ are the elements of a spatial weight matrix with zeroes on the diagonal;
     \item $W=\sum_{i=1}^{N}\sum_{j=1}^{N}w_{i,j}$.
 \end{itemize}
-[FIGURE INSERT HERE]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{moran example.png}
+    \caption{Moran's I examples. (Böck et al., 2017)}
+    \label{fig:moran_ex}
+\end{figure}
 
 An inverse Euclidean distance weight matrix was decided with a $16$ pixels radius cutoff as it penalizes distant pixels so key structural differences 
 between the two noise types can be accurately captured. The formula is:
@@ -273,7 +279,7 @@ The final quantitative metric I will use is called the power spectral density, a
 distribution of a signal across frequencies (Slavič et al., 2021, p.64). For our use case, where the signal is discrete and two dimensional, 
 the power spectral density can be expressed as (Blackman \& Tukey, 1958, p.193):
 \[P(u,v)=\frac{1}{MN}{\|\EuScript{F}(u,v)\|}^2\]
-where $\EuScript{F}(u,v)$ is the 2-D Discrete Fourier Transform (DFT) (Gonzalez \& Woods, 2007, p.257):
+where $\EuScript{F}(u,v)$ is the 2D Discrete Fourier Transform (DFT) (Gonzalez \& Woods, 2007, p.257):
 \[\EuScript{F}(u,v)=\sum_{u=0}^{M-1}\sum_{v=0}^{N-1}f(x,y)e^{-j2\pi\left(\frac{ux}{M}+\frac{vy}{N}\right)}\]
 Adapting to this IA, we will firstly substitute $M=N$ due to our square terrain map and secondly, substitute $f(x,y)$ with $\EuScript{N}_{FV}(x,y)$
 or $\EuScript{N}_{FP}(x,y)$.
