@@ -319,21 +319,11 @@ real-life data. All of these results, rounded to 4 decimal places, are summarize
 \end{table}
 
 A histogram was also plotted and is shown here in Figure \ref{fig:histogram_real}
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{histogram real life data.png}
     \caption{Reselected real-life probability density histogram}
     \label{fig:histogram_real}
-\end{figure}
-
-Similarly, their Power Spectral Density was also computed and plotted in Figure \ref{fig:PSD_real}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{psd real life.png}
-    \caption{PSD of the reselected real-life data}
-    \label{fig:PSD_real}
 \end{figure}
 
 The mean elevation values obtained aligns with known elevation profiles, with Everest being the highest, followed by Matterhorn and Denali. The variance metric indicates Everest exhibits 
@@ -348,11 +338,18 @@ Denali's elevation changes are more locally concentrated, while Everest's variat
 consistent with its relatively uniform appearance in Figure \ref{fig:heatplot_realFinal}. Finally, Moran's I spatial autocorrelation values confirm strong elevation clustering, with Matterhorn exhibiting near-perfect 
 spatial dependence. This is evident in that we can all clearly discern clusters of high elevation from clusters of low elevation. 
 
-These statistical measures are corroborated by the PSD in Figure \ref{fig:PSD_real}. The PSD for Everest exhibits a broader spread of energy into the mid and high-frequency ranges, evident from the more 
+Next, the PSD of the selected terrains were also computed using technology and is shown in Figure \ref{fig:PSD_real}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{psd real life.png}
+    \caption{PSD of the reselected real-life data}
+    \label{fig:PSD_real}
+\end{figure}
+The PSD clearly corrbates the statistical measures in Table \ref{table:real_stats}. The PSD for Everest exhibits a broader spread of energy into the mid and high-frequency ranges, evident from the more 
 diffused transition from red to green/blue. This aligns with Everest's high variance and kurtosis, reinforcing that Everest exhibit complex terrain morphology featuring both large scale 
 elevation changes to fine-scale topographic details. For Denali, the PSD has a stronger central concentration of energy and a rapid falloff, signifying the dominance of low-frequency elements. 
 This is also supported by the histogram (Figure \ref{fig:histogram_real}), which shows that there is little variation in the elevation data of Denali. Lastly, for Matterhorn, it retains a strong low-frequency core 
-but with more pronounced mid-frequency components than Denali. This matches the intermediate variance and skewness in elevation distribution.
+but with more pronounced mid-frequency components than Denali. This matches the variance and skewness in elevation distribution.
 
 This quantitative analysis of Everest, Denali, and Matterhorn terrains establishes critical statistical benchmarks that will serve as essential reference points when evaluating noise-generated 
 terrain models. The comprehensive statistical profiles reveal distinct yet consistent geomorphological signatures that must be replicated in synthetic terrains to achieve geological plausibility, 
@@ -361,7 +358,12 @@ particularly in their elevation distributions, topographic complexity, and spati
 The parameters for the noise we will be using to compare will be the same as those used to generate Figure 5. Firstly, before comparing it to real-life elevation, I wanted to quantitively 
 distinguish Perlin noise and Value noise. Like before, a table of statistical measures were calculated (Table \ref{table:noise_stats}), along with a histogram and the PSD. 
 
-\begin{table}[h!]
+The synthetic elevation models generated using Value noise and Perlin noise display distinct statistical and spatial characteristics. Perlin noise exhibits a higher mean elevation and nearly double 
+the variance compared to Value noise, indicating greater vertical heterogeneity and a broader distribution of elevation values. This aligns with the smoother yet more structured gradients typically 
+associated with Perlin noise. The increased variance suggests that Perlin terrain incorporates more differentiated features, resembling the unevenness found in natural landscapes. In contrast, the 
+lower variance in the Value noise terrain reflects a more homogenous surface with minimal variation in elevation.
+
+\begin{table}[h]
     \begin{tblr}{
         colspec={X[1,l] X[1,l] X[1,l] X[1,l] X[1,l] X[1,l] X[1,l]},
         width=\textwidth,
@@ -377,11 +379,6 @@ distinguish Perlin noise and Value noise. Like before, a table of statistical me
     \label{table:noise_stats}
 \end{table}
 
-The synthetic elevation models generated using Noise and Perlin noise display distinct statistical and spatial characteristics. Perlin noise exhibits a higher mean elevation and nearly double 
-the variance compared to pure Noise, indicating greater vertical heterogeneity and a broader distribution of elevation values. This aligns with the smoother yet more structured gradients typically 
-associated with Perlin noise. The increased variance suggests that Perlin terrain incorporates more differentiated features, resembling the unevenness found in natural landscapes. In contrast, the 
-lower variance in the Noise terrain reflects a more homogenous surface with minimal variation in elevation.
-
 Kurtosis and skewness values further differentiate the two. The basic Value noise model yields a positive kurtosis, indicating a leptokurtic distribution with a sharper peak around the mean and 
 more frequent extreme values. Perlin, by contrast, is distinctly platykurtic, suggesting a flatter distribution with fewer outliers and a more even spread of elevation values. This pattern is 
 reinforced by skewness metrics: Value noise shows a strong positive skew, meaning lower elevation values dominate the distribution. Perlin's skewness is closer to zero, indicating a more symmetric 
@@ -389,7 +386,7 @@ terrain profile with less pronounced elevation bias.
 
 The Terrain Ruggedness Index (TRI) again favors Perlin, although more subtly, with a slightly higher value compared to Value noise. While both values remain low relative to natural terrains, this 
 suggests Perlin includes more local elevation changes and minor features that contribute to a more textured surface. Interestingly, Moran's I values remain high for both, indicating strong spatial 
-autocorrelation. While this might be expected for Perlin due to its smooth gradients, the similarly high value for Noise implies that even the random noise used here exhibits spatial dependence, 
+autocorrelation. While this might be expected for Perlin due to its smooth gradients, the similarly high value for Value noise implies that even random scalar values with no directionality exhibits spatial dependence, 
 perhaps due to interpolation during generation.
 
 Yet, when compared to the elevation profiles of real-world landscapes, both synthetic models exhibit a lack of realism. Starting with mean elevation, their modest averages reflect the absence of 

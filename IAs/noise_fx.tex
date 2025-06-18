@@ -24,13 +24,20 @@ random values as follows:
 \end{itemize}
 For any query point $(x,y)\in Q_\text{base}$, and let $(i,j)$ be the coordinate of the top-left vertex associated with the
 chosen query coordinate, then because all vertex coordinates are integer pairs, the value of $i$ and $j$ can be found by rounding
-$x$ and $y$ down to the nearest integer, which is written as the floor function.
-\[i=\lfloor x\rfloor,j=\lfloor y\rfloor\] 
+$x$ and $y$ down to the nearest integer: $i=\lfloor x\rfloor,j=\lfloor y\rfloor$.
+ 
 Subsequently, the associated top-right, bottom-right, and bottom-left vertices are respectively $(i+1,j)$, $(i+1,j+1)$, and $(i,j+1)$.
 
 Finally, interpolate the query point with the values at the four lattice vertices to obtain the height value at the query point. Although
 bicubic and spline interpolations are possible, due to the limited scope of this IA, we will only be exploring bilinear interpolation with 
 different polynomial smoothstep function $S_n(t)$, where $n$ is the order of the function. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{noise steps.png}
+    \caption{Steps to constructing a terrain from Value and Perlin noise.}
+    \label{fig:noise_steps}
+\end{figure}
 
 To derive the formula for bilinear interpolation, we first interpolate in the $x$-direction which yields two intermediate values
 \begin{align*}
@@ -143,7 +150,6 @@ Applying the boundary condition and continuity condition, we obtain the simultan
         2a_2+3a_3=0\quad \text{\textcircled{\footnotesize{B}}}
     \end{cases*}
 \end{align}
-
 Rewrite equation 2A in terms of $a_3$
 \[a_3=1-a_2\]
 then substitute into equation 2B
@@ -161,7 +167,7 @@ Thus, the smoothstep function of order 3 becomes:
 As mentioned, we will also attempt to derive the quintic smoothstep function $S_5(t)$
 \[S_5(t)=a_3t^3+a_4t^4+a_5t^5\]
 Applying the continuity and boundary condition:
-\begin{align}
+\begin{align} \label{eq:4}
     \begin{cases*}
         \sum_{k=3}^{5}a_k=1 \\
         S_5'(1)=0 \\
@@ -180,24 +186,32 @@ Applying the continuity and boundary condition:
         3a_3+6a_4+10a_5=0
     \end{cases*}
 \end{align}
+For concision, this system of equations will be solved using the Gauss-Jordan Elimination method, through an online calculator provided 
+by Reshish (n.d.). The augmented matrix containing the coefficients from Equation \ref{eq:4} supplied to the website is:
+\begin{equation*}
+    \begin{amatrix}{3}
+        1 & 1 & 1 & 1\\
+        3 & 4 & 5 & 0\\
+        3 & 6 & 10 & 0
+    \end{amatrix}
+\end{equation*}
+which resulted in
+\[S_5(t)=6t^5-15t^4+10t^3\]
+A manual computation using the same method has also been performed and is presented in Appendix B due to the IA's page limit. 
 
-PUT GAUSSIAN ELIMINATION STUFF HERE LATER
+Although a smoothstep function of order 5 will result in even smoother transitions due to higher-order derivatives (evidence can be found in the 
+graph in Appendix B), it introduces additional computation complexity and may excessively dampen variations in the terrain, making them appear 
+unnaturally soft. Thus, $S_3(t)$ was opted for instead, which is also commonly adopted as a “faithful” implementation of Ken Perlin's original 
+method (Perlin, 1985).
 
-There are two other parameters we will adress: persistence and lacunarity. Typically, a noise function with a single frequency will look 
-overly smooth and artificial. Natural terrains, on the other hand, exhibit complexity at multiple scales. For instance, a mountain presents broad overall forms alongside finer features such 
-as ridges and crevices layered atop one another.
-
-To replicate the complexity of natural terrains, fractal noise is used where multiple layers of noise (called octaves) are summed, each with 
-decreasing amplitude and increasing frequency. The parameter persistence, $0<P<1$, controls the rate at which amplitude decay, ensuring higher 
-frequency details do not overwhelm the overall coherence. Lacunarity, $L>1$, determines the rate of frequency growth, introducing finer-scale 
-variations. Commonly, the value of $P$ and $L$ is chosen such that $P\cdot L=1$. Finally, the total number of octaves, $C\ge 1$, controls the level of detail in the terrain. Putting this together, the final terrain 
-height at pixel $(u,v)$ is given by:
+There are two other parameters we will adress: persistence and lacunarity. To replicate natural terrain's multi-scale complexity, fractal noise is used where multiple 
+layers of noise (called octaves) are summed, each with decreasing amplitude and increasing frequency. The parameter persistence, $0<P<1$, controls the rate at which 
+amplitude decay, ensuring higher frequency details do not overwhelm the overall coherence. Lacunarity, $L>1$, determines the rate of frequency growth, introducing 
+finer-scale variations. Finally, the total number of octaves, $C\ge 1$, controls the level of 
+detail in the terrain. Putting this together, the final terrain height at pixel $(u,v)$ is given by:
 \[\EuScript{N}_{FV}(x,y)=\sum_{k=0}^{C-1}A_k\cdot\EuScript{N}_V\left(\lambda_k\frac{u}{N},\lambda_k\frac{v}{N}\right)\]
-where
-\begin{itemize}
-    \item $A_k=A_0\cdot P^k$
-    \item $\lambda_k=\lambda_0\cdot L^k$
-\end{itemize}
+where $A_k=A_0\cdot P^k$ and $\lambda_k=\lambda_0\cdot L^k$.
+
 $\EuScript{N}_V$ can be replaced by $\EuScript{N}_P$, and thus $\EuScript{N}_{FV}(x,y)$ to $\EuScript{N}_{FP}(x,y)$, depending on which noise variant 
 is being used. One final detail is determining the upper bound for $C$. Recall that $\lambda_{C-1}$ must satisfy the Nyquist limit mentioned earlier, 
 which gives us the inequality:
@@ -214,20 +228,75 @@ Having introduced the core theory and parameters in this IA, I will now present 
 
 Firstly, all elevation values generated from noise functions are aggregated and plotted onto a histogram to analyze their statistical distribution. The 
 number of intervals were determined using Rice rule, a preferred method which “set the number of intervals to twice the cube root of the number of 
-observations.” (Lane \& Scott, n.d.). For our dataset of $256\times256=65536$ samples, this yielded $81$ intervals after rounding up. To further analyze 
-the elevation values generated from the noise function, several statistical measures were computed to capture various characteristics of the terrain.
-
-Let $X_{u,v}$ defines the elevation value at pixel $(u,v)$, the mean ($\mu$) provides the average elevation, giving a sense of the overall altitude of the 
+observations.” (Lane \& Scott, n.d.). Based on our dataset of $256\times256=65536$ samples, this yielded $81$ intervals after rounding up. To further analyze 
+the terrain characteristics the noise functions, several statistical measures were computed using technology (see Appendix A). For illustrative purposes, 
+these will also be hand-calculated with respect to the example $4\times4$ terrain $X$
+\begin{equation*}
+    X=
+    \begin{bmatrix}
+        1 & 2 & 3 & 4\\
+        4 & 5 & 6 & 7\\
+        7 & 6 & 5 & 4\\
+        3 & 2 & 1 & 0
+    \end{bmatrix}
+\end{equation*}
+The first metric, mean ($\mu$), provides the average elevation, giving a sense of the overall altitude of the 
 terrain, and is calculated using the equation:
 \[\mu=\frac{1}{N^2}\sum_{u=0}^{N-1}\sum_{v=0}^{N-1}X_{u,v}\]
+\begin{example}{Mean calculation}
+    \[\mu=\frac{1}{16}\sum_{u=0}^{3}\sum_{v=0}^{3}X_{u,v}=\frac{1}{16}(1+2+3+4+4+5+6+7+7+6+5+4+3+2+1+0)=3.75\]
+\end{example}
+
 The variance ($\sigma^2$) quantifies how spread out the elevations are from the mean, where a higher variance indicates a more varied terrain:
 \[\sigma^2=\frac{1}{N^2}\sum_{u=0}^{N-1}\sum_{v=0}^{N-1}{(X_{u,v}-\mu)}^2\]
+\begin{example}{Variance calculation}
+    \[\sigma^2=\frac{1}{16}\sum_{u=0}^{3}\sum_{v=0}^{3}{(X_{u,v}-3.75)}^2\]
+    We calculate the squared differences from the mean:
+    \begin{equation*}
+        \begin{matrix}
+            (1-3.75)^2=7.5625; & (2-3.75)^2=3.0625; & (3-3.75)^2=0.5625; & (4-3.75)^2=0.0625 \\
+            (4-3.75)^2=0.0625; & (5-3.75)^2=1.5625; & (6-3.75)^2=5.0625; & (7-3.75)^2=10.5625 \\
+            (7-3.75)^2=10.5625; & (6-3.75)^2=5.0625; & (5-3.75)^2=1.5625; & (4-3.75)^2=0.0625 \\
+            (3-3.75)^2=0.5625; & (2-3.75)^2=3.0625; & (1-3.75)^2=7.5625; & (0-3.75)^2= 14.0625
+        \end{matrix}
+    \end{equation*}
+    Summing these gives $70.25$, and so $\sigma^2=\frac{70.25}{16}\approx4.391$. To aid with skewness and kurtosis calculation, we also calculate $\sigma\approx\sqrt{4.391}\approx2.097$.
+\end{example}
+
 To assess the shape of the distribution, skewness ($\gamma_1$) is used to measure asymmetry in the dataset, where a value close to 0 suggests a symmetric 
 distribution of heights. 
 \[\gamma_1=\frac{1}{N^2}\sum_{u=0}^{N-1}\sum_{v=0}^{N-1}{\left(\frac{X_{u,v}-\mu}{\sigma}\right)}^3\]
-Furthermore, kurtosis, precisely Fisher's kurtosis ($\gamma_2$), will be used to measure the "peakedness" of the elevation distribution compared to a normal distribution, where positive kurtosis 
-means a more peaked distribution, while negative kurtosis means a flatter one.
+\begin{example}{Skewness calculation}
+    \[\gamma_1=\frac{1}{16}\sum_{u=0}^{3}\sum_{v=0}^{3}{\left(\frac{X_{u,v}-\mu}{\sigma}\right)}^3\]
+    We calculate all the terms:
+    \begin{equation*}
+        \begin{matrix}
+            {\left(\frac{1-3.75}{2.097}\right)}^3\approx-2.222; & {\left(\frac{2-3.75}{2.097}\right)}^3\approx-0.573; & {\left(\frac{3-3.75}{2.097}\right)}^3\approx-0.045; & {\left(\frac{4-3.75}{2.097}\right)}^3\approx0.002 \\
+            {\left(\frac{4-3.75}{2.097}\right)}^3\approx0.002; & {\left(\frac{5-3.75}{2.097}\right)}^3\approx0.209; & {\left(\frac{6-3.75}{2.097}\right)}^3\approx1.218; & {\left(\frac{7-3.75}{2.097}\right)}^3\approx3.677 \\
+            {\left(\frac{7-3.75}{2.097}\right)}^3\approx3.677; & {\left(\frac{6-3.75}{2.097}\right)}^3\approx1.218; & {\left(\frac{5-3.75}{2.097}\right)}^3\approx0.209; & {\left(\frac{4-3.75}{2.097}\right)}^3\approx0.002 \\
+            {\left(\frac{3-3.75}{2.097}\right)}^3\approx-0.045; & {\left(\frac{2-3.75}{2.097}\right)}^3\approx-0.573; & {\left(\frac{1-3.75}{2.097}\right)}^3\approx-2.222; & {\left(\frac{0-3.75}{2.097}\right)}^3\approx-5.648
+        \end{matrix}
+    \end{equation*}
+    Summing these gives $-1.123$, and so $\gamma_1\approx\frac{-1.123}{16}\approx-0.0702$.
+\end{example}
+
+Furthermore, kurtosis, precisely Fisher's kurtosis ($\gamma_2$), will be used to measure the "peakedness" of the elevation distribution compared to a normal 
+distribution, where positive kurtosis means a more peaked distribution, while negative kurtosis means a flatter one.
 \[\gamma_2=-3+\frac{1}{N^2}\sum_{u=0}^{N-1}\sum_{v=0}^{N-1}{\left(\frac{X_{u,v}-\mu}{\sigma}\right)}^4\]
+\begin{example}{Kurtosis calculation}
+    \[\gamma_2=-3+\frac{1}{16}\sum_{u=0}^{3}\sum_{v=0}^{3}{\left(\frac{X_{u,v}-\mu}{\sigma}\right)}^4\]
+    We calculate all the terms:
+    \begin{equation*}
+        \begin{matrix}
+            {\left(\frac{1-3.75}{2.097}\right)}^4\approx2.900; & {\left(\frac{2-3.75}{2.097}\right)}^4\approx0.477; & {\left(\frac{3-3.75}{2.097}\right)}^4\approx0.016; & {\left(\frac{4-3.75}{2.097}\right)}^4\approx0.0002 \\
+            {\left(\frac{4-3.75}{2.097}\right)}^4\approx0.0002; & {\left(\frac{5-3.75}{2.097}\right)}^4\approx0.124; & {\left(\frac{6-3.75}{2.097}\right)}^4\approx1.297; & {\left(\frac{7-3.75}{2.097}\right)}^4\approx5.695 \\
+            {\left(\frac{7-3.75}{2.097}\right)}^4\approx5.695; & {\left(\frac{6-3.75}{2.097}\right)}^4\approx1.297; & {\left(\frac{5-3.75}{2.097}\right)}^4\approx0.124; & {\left(\frac{4-3.75}{2.097}\right)}^4\approx0.0002 \\
+            {\left(\frac{3-3.75}{2.097}\right)}^4\approx0.016; & {\left(\frac{2-3.75}{2.097}\right)}^4\approx0.477; & {\left(\frac{1-3.75}{2.097}\right)}^4\approx2.900; & {\left(\frac{0-3.75}{2.097}\right)}^4\approx10.079
+        \end{matrix}
+    \end{equation*}
+    Summing these gives $31.1278$, and so $\gamma_2\approx-3+\frac{31.1278}{16}\approx-1.0545$.
+\end{example}
+
 Finally, the Terrain Ruggedness Index (TRI) quantifies how much the elevation changes between a grid cell and its neighbors, with higher TRI values indicate 
 rougher terrains.
 \[\text{Mean TRI}=\frac{1}{(N-2)^2}\sum_{u=1}^{N-2}\sum_{v=1}^{N-2}\text{TRI}_{u,v}\]
@@ -235,7 +304,21 @@ with
 \[\text{TRI}_{u,v}=\sqrt{\sum_{(a,b)\in \EuScript{P}}(X_{u,v}-{X_{u+a,v+b}})^2}\]
 where
 \[\EuScript{P}=\{(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)\}\]
-All of these metrics will be computed using technology (see APPENDIX REF).
+\begin{example}{TRI calculation}
+    We only calculate TRI for the inner $2\times2$ block of pixels, which are:
+    \[X_{1,1}=5,\quad X_{1,2}=6,\quad X_{2,1}=6,\quad X_{2,2}=5\]
+    \begin{itemize}
+        \item For $X_{1,1}$, neighbor values are $1,2,3,4,6,7,6,5$
+        \[\text{TRI}_{1,1}=\sqrt{{(5-1)}^2+{(5-2)}^2+{(5-3)}^2+{(5-4)}^2+{(5-6)}^2+{(5-7)}^2+{(5-6)}^2+{(5-5)}^2}=6\]
+        \item For $X_{1,2}$, neighbor values are $2,3,4,5,7,6,5,4$
+        \[\text{TRI}_{1,2}=\sqrt{{(6-2)}^2+{(6-3)}^2+{(6-4)}^2+{(6-5)}^2+{(6-7)}^2+{(6-6)}^2+{(6-5)}^2+{(6-4)}^2}=6\]
+        \item For $X_{2,1}$, neighbor values are $4,5,6,7,5,3,2,1$
+        \[\text{TRI}_{2,1}=\sqrt{{(6-4)}^2+{(6-5)}^2+{(6-6)}^2+{(6-7)}^2+{(6-5)}^2+{(6-3)}^2+{(6-2)}^2+{(6-1)}^2}\approx7.55\]
+        \item For $X_{2,2}$, neighbor values are $5,6,7,6,4,2,1,0$
+        \[\text{TRI}_{2,2}=\sqrt{{(5-5)}^2+{(5-6)}^2+{(5-7)}^2+{(5-6)}^2+{(5-4)}^2+{(5-2)}^2+{(5-1)}^2+{(5-0)}^2}\approx7.55\]
+    \end{itemize}
+    Finally, averaging these values we obtain the $\text{Mean TRI}\approx\dfrac{1}{4}(6+6+7.55+7.55)\approx6.775$
+\end{example}
 
 Another quantitative metric I will use is spatial autocorrelation which is often used to describe the degree to which a variable is correlated with itself 
 across space (Moraga, 2023). Positive spatial autocorrelation indicates that similar values are clustered whereas negative spatial autocorrelation indicates 
@@ -256,7 +339,7 @@ where
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{moran example.png}
+    \includegraphics[width=0.6\textwidth]{moran example.png}
     \caption{Moran's I examples. (Böck et al., 2017)}
     \label{fig:moran_ex}
 \end{figure}
@@ -273,7 +356,7 @@ between the two noise types can be accurately captured. The formula is:
 \end{align*}
 It is worth noting that here, the index $i$ and $j$ relates to pixel coordinates with the formula $i=u+256v$. Inversely, $u=i\mod 256$ and 
 $v=\lfloor\frac{i}{256}\rfloor$. The complete spatial weight matrix, and thus the Moran's I coefficient will be computed using technology 
-(see Appendix REF). 
+(see Appendix A). 
 
 The final quantitative metric I will use is called the power spectral density, a potent tool in signal processing which quantifies the power 
 distribution of a signal across frequencies (Slavič et al., 2021, p.64). For our use case, where the signal is discrete and two dimensional, 
@@ -285,4 +368,4 @@ Adapting to this IA, we will firstly substitute $M=N$ due to our square terrain 
 or $\EuScript{N}_{FP}(x,y)$.
 
 After calculating for all values of $u$ and $v$, plot $\log P(u,v)$ onto the pixel $(u,v)$. Due to the computation-heavy nature of this algorithm, 
-the PSD will be done using technology (see Appendix REF).
+the PSD will be done using technology (see Appendix A).

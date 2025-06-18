@@ -5,6 +5,28 @@
 \usepackage{graphicx}
 \usepackage{float}
 
+% Python syntax highlighting
+\usepackage{listings}
+\lstset{
+    breaklines=true,
+    numbers=left,
+    numbersep=1em,
+    xleftmargin=15pt,
+    language={Python},
+    basicstyle=\footnotesize\ttfamily,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color[rgb]{0.13,0.54,0.13},
+    stringstyle=\color{cyan},
+}
+
+% Augmented Matrix
+\newenvironment{amatrix}[1]{%
+  \left[\begin{array}{@{}*{#1}{c}|c@{}}
+}{%
+  \end{array}\right]
+}
+
 % Tables
 \usepackage{tabularray}
 
@@ -28,18 +50,12 @@
 
 % custom colors
 \usepackage[dvipsnames]{xcolor}
-\definecolor{ivory}{RGB}{242, 245, 234}
-\definecolor{pacific-cyan}{RGB}{34, 174, 209}
-\definecolor{sage}{RGB}{187, 199, 164}
-\definecolor{blush}{RGB}{231, 90, 124}
 \definecolor{timberwolf}{RGB}{214, 219, 210}
 
 % framed box
 \usepackage[skins]{tcolorbox}
 
 % Counters
-\newcounter{definitioncounter}
-\newcounter{theoremcounter}
 \newcounter{examplecounter}
 
 % Custom commands
@@ -55,51 +71,13 @@
 \setlength{\parskip}{10pt}
 \setlength{\parindent}{0pt}
 
-
-% Custom box environment
-\newtcolorbox{custombox}[3]{
-    enhanced, 
-    colframe=black, 
-    colback=ivory,
-    title=\textbf{#1 #2. \hspace*{5pt} #3},
-    colbacktitle=sage,
-    coltitle=black,
-    toptitle=5pt,
-    bottomtitle=5pt,
-    titlerule=0pt,
-    before skip=7.5pt, 
-    after skip=12.5pt, 
-    arc=1.5mm, 
-    drop fuzzy shadow southeast,
-}
-
-% Definition environment
-\newenvironment{definition}[1]
-    {
-        \refstepcounter{definitioncounter}
-        \begin{custombox}{Definition}{\thedefinitioncounter}{#1}
-    }
-    {
-        \end{custombox}
-    }
-
-% Theorem environment
-\newenvironment{theorem}[1]
-    {
-        \refstepcounter{theoremcounter}
-        \begin{custombox}{Theorem}{\thetheoremcounter}{#1}
-    }
-    {
-        \end{custombox}
-    }
-
-% Proof
-
 % Example
-\newenvironment{example}[2]
+\newenvironment{example}[1]
     {
         \refstepcounter{examplecounter}
-        \hspace*{5pt}\textbf{Example \theexamplecounter. \hspace*{10pt} #1}
+        \vspace*{5pt}
+        \hspace*{-10pt}
+        \textbf{\small{\textcolor{gray}{Example \theexamplecounter. \hspace*{2.5pt} #1}}}
         \begin{tcolorbox}[
             enhanced,
             boxrule=0pt,
@@ -107,16 +85,15 @@
             frame hidden,
             borderline west={1.5pt}{0pt}{timberwolf},
             sharp corners,
-            before skip=0pt, 
-            top=2.5pt,
-            left=2.5pt,
+            before skip=-2.5pt, 
+            top=0pt,
+            left=5pt,
         ]
-        #2
-        \\[17.5pt]
-        \hspace*{20pt}\small{\textbf{SOLUTION}}\hspace*{20pt}
+        \color{gray}
+        \small
     }
     {
         \end{tcolorbox}
-        \vspace*{-16.5pt}
+        \vspace*{-14pt}
         \textcolor{timberwolf}{\rule{15pt}{1.5pt}}
     }
